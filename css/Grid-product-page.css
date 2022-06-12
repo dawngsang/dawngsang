@@ -1,0 +1,82 @@
+.in-post-meta {
+    display: none !important;
+}
+.post-header {
+    display: flex;
+    justify-content: center;
+}
+/* Tạo ra 4 cột bằng nhau */
+.column-prdt-grid {
+    float: left;
+    width: 25%;
+    padding: 10px 10px;
+}
+/* Loại bỏ lề trái & phải và khoảng cách */
+.row-prdt-grid {
+    margin: 0 -5px;
+}
+/* Clear floats after the columns */
+.row-prdt-grid:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+/* Responsive columns */
+@media screen and (max-width: 600px) {
+    .column-prdt-grid {
+        width: 50%;
+        margin-bottom: 20px;
+    }
+}
+/* Style the counter cards */
+.card-prdt-grid {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin: auto;
+    text-align: center;
+    background-color: #f1f1f1;
+}
+/* Make Grid Container Over */
+.make-grid-container-over {
+    margin: auto -15px !important;
+}
+/* Bo Tròn Khunng hình ảnh*/
+div.card-prdt-grid img {
+    border-radius: 0 0 15px 15px !important;
+}
+/*Chuyển đổi ngôi sao màu vàng*/
+.checked-star {
+    color: orange;
+} /* kiểu cho thông tin sản phẩm*/
+p.product-price {
+    color: brown;
+}
+h2.product-tittle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 38px !important;
+    font-size: 13px !important;
+    margin: 15px 5px 0px 5px !important;
+    line-height: 1.2;
+}
+p.product-star-vote {
+    font-size: 10px !important;
+} /* Kiểu cho nút mua ngay */
+.card-btn-grid {
+    border: none;
+    outline: 0;
+    padding: 8px;
+    color: white;
+    background-color: #6a3702;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 13px;
+}
+.card-btn-grid:hover {
+    opacity: 0.7;
+}
+.product-info {
+    margin: 10px auto;
+    padding: 0;
+}
