@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Demo Image Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    #thumb { width: 200px; cursor: pointer; }
+    #viewer.hidden { display: none; }
+    #viewer { position: fixed; inset: 0; z-index: 9999; }
+    .overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); }
+    .image-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; cursor: grab; }
+    .image-wrapper img { transform-origin: center center; user-select: none; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <h1>Demo xem ảnh phóng to/thu nhỏ</h1>
+  <p>Nhấp vào ảnh để mở hộp thoại xem ảnh.</p>
+  <img id="thumb" src="https://via.placeholder.com/600x400?text=Demo+Image" alt="Ảnh minh họa" />
+
+  <div id="viewer" class="hidden">
+    <div class="overlay"></div>
+    <div class="image-wrapper">
+      <img id="fullImage" src="https://via.placeholder.com/1200x800?text=Demo+Image" alt="" />
+    </div>
+  </div>
+
+  <script>
+    const thumb = document.getElementById('thumb');
+    const viewer = document.getElementById('viewer');
+    const fullImage = document.getElementById('fullImage');
+    const wrapper = viewer.querySelector('.image-wrapper');
+
+    let scale = 1, posX = 0, posY = 0, isDragging = false, startX, startY;
+
+    thumb.onclick = () => {
+      scale = 1; posX = 0; posY = 0;
+      fullImage.style.transform = `translate(0px, 0px) scale(1)`;
+      viewer.classList.remove('hidden');
+    };
+
+    viewer.querySelector('.overlay').onclick = () => {
+      viewer.classList.add('hidden');
+    };
+
+    wrapper.onwheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      scale = Math.min(Math.max(scale + delta, 0.2), 5);
+      fullImage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    };
+
+    wrapper.onmousedown = (e) => {
+      isDragging = true;
+      wrapper.style.cursor = 'grabbing';
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+    };
+
+    wrapper.onmousemove = (e) => {
+      if (!isDragging) return;
+      posX = e.clientX - startX;
+      posY = e.clientY - startY;
+      fullImage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    };
+
+    const stopDragging = () => {
+      isDragging = false;
+      wrapper.style.cursor = 'grab';
+    };
+    wrapper.onmouseup = stopDragging;
+    wrapper.onmouseleave = stopDragging;
+  </script>
+</body>
+</html>
