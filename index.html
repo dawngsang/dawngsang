@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Demo Image Viewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .gallery img { width: 200px; cursor: pointer; margin-right: 10px; }
+    #viewer.hidden { display: none; }
+    #viewer { position: fixed; inset: 0; z-index: 9999; }
+    .overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7); }
+    .image-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden; cursor: grab; }
+    .image-wrapper img { transform-origin: center center; user-select: none; pointer-events: none; }
+    button.control { position: absolute; background: rgba(255, 255, 255, 0.8); border: none; padding: 0.5rem; cursor: pointer; }
+    button.close { top: 10px; right: 10px; }
+    button.prev { top: 50%; left: 10px; transform: translateY(-50%); }
+    button.next { top: 50%; right: 10px; transform: translateY(-50%); }
+    .zoom { position: absolute; bottom: 10px; right: 10px; }
+    .zoom button { margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Demo xem ảnh phóng to/thu nhỏ</h1>
+  <p>Nhấp vào ảnh để mở hộp thoại xem ảnh.</p>
+  <div class="gallery">
+    <img class="thumb" src="https://via.placeholder.com/600x400?text=Ảnh+1" data-full="https://via.placeholder.com/1200x800?text=Ảnh+1" alt="Ảnh 1" />
+    <img class="thumb" src="https://via.placeholder.com/600x400?text=Ảnh+2" data-full="https://via.placeholder.com/1200x800?text=Ảnh+2" alt="Ảnh 2" />
+    <img class="thumb" src="https://via.placeholder.com/600x400?text=Ảnh+3" data-full="https://via.placeholder.com/1200x800?text=Ảnh+3" alt="Ảnh 3" />
+  </div>
+
+  <div id="viewer" class="hidden">
+    <div class="overlay"></div>
+    <div class="image-wrapper">
+      <img id="fullImage" src="" alt="" />
+    </div>
+    <button class="control close" id="closeBtn">&times;</button>
+    <button class="control prev" id="prevBtn">&#8249;</button>
+    <button class="control next" id="nextBtn">&#8250;</button>
+    <div class="zoom">
+      <button class="control" id="zoomInBtn">+</button>
+      <button class="control" id="zoomOutBtn">-</button>
+    </div>
+  </div>
+
+  <script>
+    const thumbs = document.querySelectorAll('.thumb');
+    const viewer = document.getElementById('viewer');
+    const fullImage = document.getElementById('fullImage');
+    const wrapper = viewer.querySelector('.image-wrapper');
+    const closeBtn = document.getElementById('closeBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+    const images = Array.from(thumbs).map(img => img.dataset.full || img.src);
+    let currentIndex = 0;
+    let scale = 1, posX = 0, posY = 0, isDragging = false, startX, startY;
+
+    function openViewer(index) {
+      currentIndex = index;
+      fullImage.src = images[currentIndex];
+      scale = 1; posX = 0; posY = 0;
+      fullImage.style.transform = `translate(0px, 0px) scale(1)`;
+      viewer.classList.remove('hidden');
+    }
+
+    thumbs.forEach((img, idx) => {
+      img.addEventListener('click', () => openViewer(idx));
+    });
+
+    function closeViewer() {
+      viewer.classList.add('hidden');
+    }
+    closeBtn.onclick = closeViewer;
+    viewer.querySelector('.overlay').onclick = closeViewer;
+
+    function showImage(index) {
+      if (index < 0) index = images.length - 1;
+      if (index >= images.length) index = 0;
+      openViewer(index);
+    }
+    prevBtn.onclick = () => showImage(currentIndex - 1);
+    nextBtn.onclick = () => showImage(currentIndex + 1);
+
+    function applyTransform() {
+      fullImage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    }
+
+    zoomInBtn.onclick = () => { scale = Math.min(scale + 0.1, 5); applyTransform(); };
+    zoomOutBtn.onclick = () => { scale = Math.max(scale - 0.1, 0.2); applyTransform(); };
+
+    wrapper.onwheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      scale = Math.min(Math.max(scale + delta, 0.2), 5);
+      applyTransform();
+    };
+
+    wrapper.onmousedown = (e) => {
+      isDragging = true;
+      wrapper.style.cursor = 'grabbing';
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+    };
+
+    wrapper.onmousemove = (e) => {
+      if (!isDragging) return;
+      posX = e.clientX - startX;
+      posY = e.clientY - startY;
+      applyTransform();
+    };
+
+    function stopDragging() {
+      isDragging = false;
+      wrapper.style.cursor = 'grab';
+    }
+    wrapper.onmouseup = stopDragging;
+    wrapper.onmouseleave = stopDragging;
+  </script>
+</body>
+</html>
